@@ -1,0 +1,29 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ideas/{ideaId} {
+      // Public ideas are readable by all visitors.
+      allow read: if true;
+
+      // Visitors can submit only a short text and one of the five allowed categories.
+      // They cannot edit or delete existing submissions.
+      allow create: if
+        request.resource.data.keys().hasOnly(['category', 'text', 'createdAt']) &&
+        request.resource.data.keys().hasAll(['category', 'text', 'createdAt']) &&
+        request.resource.data.category is string &&
+        request.resource.data.category in [
+          'Discrimination',
+          'Privilege',
+          'Advocacy',
+          'Environmental Degradation',
+          'Tyranny'
+        ] &&
+        request.resource.data.text is string &&
+        request.resource.data.text.size() > 0 &&
+        request.resource.data.text.size() <= 500 &&
+        request.resource.data.createdAt == request.time;
+
+      allow update, delete: if false;
+    }
+  }
+}
