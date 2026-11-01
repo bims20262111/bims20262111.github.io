@@ -195,20 +195,49 @@ async function loadBadWords() {
 }
 
 function containsBadWord(text) {
-  const normalized = text.toLowerCase();
+    const normalized = text
+        .toLowerCase()
+        .normalize("NFC");
 
-  return badWords.some(word => {
-    // 영어는 독립된 단어인지 검사
-    if (/^[a-z]+$/i.test(word)) {
-      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      return new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`, "i")
-        .test(normalized);
-    }
+    return badWords.some(word => {
+        word = word.trim().toLowerCase();
 
-    // 한국어 및 초성 표현 검사
-    return normalized.includes(word);
-  });
+        if (!word) return false;
+
+        // 영어 단어: 독립된 단어일 때만 차단
+        if (/^[a-z]+$/.test(word)) {
+            const escaped = word.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+            const regex = new RegExp(
+                `(^|[^a-z])${escaped}([^a-z]|$)`,
+                "i"
+            );
+
+            return regex.test(normalized);
+        }
+
+        // 한국어 욕설 및 초성 표현
+        // 단, 짧은 표현은 독립된 형태일 때만 검사
+        if (word.length <= 3) {
+            const escaped = word.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                "\\$&"
+            );
+
+            const regex = new RegExp(
+                `(^|[\\s.,!?~])${escaped}($|[\\s.,!?~])`
+            );
+
+            return regex.test(normalized);
+        }
+
+        return normalized.includes(word);
+    });
 }
+
 
 // 목록 로딩을 시작하되, 페이지 실행을 기다리게 하지는 않음
 const badWordsReady = loadBadWords();
