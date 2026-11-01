@@ -153,53 +153,67 @@ const db = getFirestore(app);
 // Firebase 컬렉션 이름
 const ideasRef = collection(db, "solutions");
 
-let korean = false;
-// 부적절한 단어 목록
-const badWords = [
-
-    // 한국어 욕설 및 비하 표현
-    "시발", "씨발", "ㅅㅂ", "ㅆㅂ",
-    "병신", "븅신", "ㅂㅅ",
-    "지랄", "ㅈㄹ",
-    "개새끼", "새끼", "씹새끼",
-    "좆", "존나", "졸라",
-    "꺼져", "닥쳐", "엿먹어",
-    "미친놈", "미친년", "또라이",
-    "쓰레기", "벌레",
-
-    // 영어 욕설 및 비하 표현
-    "fuck", "fucking", "shit",
-    "bitch", "bastard", "asshole",
-    "dick", "damn", "crap",
-    "motherfucker", "stfu",
-    "idiot", "moron", "stupid",
-
-    // 혐오 및 차별 표현
-    "racist", "nazi", "retard",
-    "go kill yourself",
-    "you are worthless",
-    "hate you",
-
-    // 괴롭힘 및 위협 표현
-    "죽여버린다",
-    "죽어",
-    "죽이고 싶다",
-    "때려죽인다",
-    "가만두지 않겠다",
-    "찾아가서 혼내준다",
-    "괴롭혀주겠다"
+const BAD_WORD_URLS = [
+  "https://cdn.jsdelivr.net/gh/hlog2e/bad_word_list@master/word_list.json",
+  "https://raw.githubusercontent.com/dsojevic/profanity-list/main/en.txt"
 ];
 
-// 부적절한 단어 검사
-function containsBadWord(text) {
+let badWords = [];
 
-    const lowerText = text.toLowerCase();
-
-    return badWords.some(word =>
-        lowerText.includes(word.toLowerCase())
+async function loadBadWords() {
+  try {
+    const responses = await Promise.all(
+      BAD_WORD_URLS.map(url => fetch(url))
     );
 
+    if (responses.some(response => !response.ok)) {
+      throw new Error("금칙어 목록 다운로드 실패");
+    }
+
+    const koreanData = await responses[0].json();
+    const englishText = await responses[1].text();
+
+    const koreanWords = Array.isArray(koreanData)
+      ? koreanData
+      : Object.values(koreanData).flat();
+
+    const englishWords = englishText.split(/\r?\n/);
+
+    badWords = [...koreanWords, ...englishWords]
+      .filter(word => typeof word === "string")
+      .map(word => word.trim().toLowerCase())
+      .filter(Boolean);
+
+    badWords = [...new Set(badWords)];
+
+    console.log("금칙어 로딩 완료:", badWords.length);
+
+  } catch (error) {
+    console.error("금칙어 로딩 실패:", error);
+    badWords = [];
+  }
 }
+
+function containsBadWord(text) {
+  const normalized = text.toLowerCase();
+
+  return badWords.some(word => {
+    // 영어는 독립된 단어인지 검사
+    if (/^[a-z]+$/i.test(word)) {
+      const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp(`(^|[^a-z])${escaped}([^a-z]|$)`, "i")
+        .test(normalized);
+    }
+
+    // 한국어 및 초성 표현 검사
+    return normalized.includes(word);
+  });
+}
+
+// 목록 로딩을 시작하되, 페이지 실행을 기다리게 하지는 않음
+const badWordsReady = loadBadWords();
+ 
+let korean = false;
 let ideas = [];
 
 
@@ -276,13 +290,19 @@ window.addIdea = async function() {
         return;
     }
     
+    await badWordsReady;
+    
+    if (badWords.length === 0) {
+        message.innerText = korean
+            ? "금칙어 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+            : "Could not load the word filter. Please try again.";
+        return;
+    }
+    
     if (containsBadWord(text)) {
-
-        message.innerText =
-            korean
-            ? "부적절한 표현이 포함되어 있습니다. 수정해 주세요."
-            : "Your text contains inappropriate words. Please edit it.";
-
+        message.innerText = korean
+            ? "부적절한 표현이 포함되어 있습니다."
+            : "Your text contains inappropriate language.";
         return;
     }
 
