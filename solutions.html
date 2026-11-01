@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Our Solutions</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: white;
+    margin: 30px;
+    color: black;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+}
+
+.language {
+    text-align: right;
+}
+
+button {
+    padding: 8px;
+    font-family: Arial;
+}
+
+#solutions {
+    width: 80%;
+    max-width: 700px;
+    margin: 30px auto;
+}
+
+.solution {
+    border: 1px solid gray;
+    background-color: #f7f7f7;
+    padding: 15px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+.category {
+    font-size: 12px;
+    color: gray;
+    margin-bottom: 10px;
+}
+
+.text {
+    font-size: 16px;
+    line-height: 1.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="language">
+    <button onclick="changeLanguage()">한국어 / English</button>
+</div>
+
+<h1 id="title">Our Solutions</h1>
+
+<p id="intro">Solutions shared by people around the world.</p>
+
+<div id="solutions">
+    <p>Loading solutions...</p>
+</div>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    onSnapshot,
+    query,
+    orderBy,
+    limit
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// Firebase 설정
+const firebaseConfig = {
+  apiKey: "AIzaSyC5oEsTnCqDmiR2lvZ2iNsxDVWh7a_XTNQ",
+  authDomain: "bimspc.firebaseapp.com",
+  projectId: "bimspc",
+  storageBucket: "bimspc.firebasestorage.app",
+  messagingSenderId: "486060537831",
+  appId: "1:486060537831:web:bb623ac9e6d4a425b1ef42",
+  measurementId: "G-1T41J3RS0D"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const solutionsRef = collection(db, "solutions");
+
+let korean = false;
+let solutions = [];
+
+
+// 사회 문제 번역
+function translateProblem(problem) {
+
+    if (!korean) {
+        return problem;
+    }
+
+    const translations = {
+        "Discrimination": "차별",
+        "Privilege": "특권",
+        "Advocacy": "옹호",
+        "Environmental Degradation": "환경 파괴",
+        "Tyranny": "폭정"
+    };
+
+    return translations[problem] || problem;
+}
+
+
+// 언어 변경
+window.changeLanguage = function() {
+
+    korean = !korean;
+
+    document.getElementById("title").innerText =
+        korean ? "우리들의 해결책" : "Our Solutions";
+
+    document.getElementById("intro").innerText =
+        korean ? "사람들이 공유한 해결책입니다." :
+        "Solutions shared by people around the world.";
+
+    showSolutions();
+
+};
+
+
+// 해결책 표시
+function showSolutions() {
+
+    const box = document.getElementById("solutions");
+
+    box.innerHTML = "";
+
+    solutions.forEach(function(item) {
+
+        const card = document.createElement("div");
+        card.className = "solution";
+
+        const category = document.createElement("div");
+        category.className = "category";
+        category.innerText = translateProblem(item.problem);
+
+        const text = document.createElement("div");
+        text.className = "text";
+        text.innerText = item.text;
+
+        card.appendChild(category);
+        card.appendChild(text);
+
+        box.appendChild(card);
+
+    });
+
+    if (solutions.length === 0) {
+
+        const empty = document.createElement("p");
+
+        empty.innerText =
+            korean ? "아직 등록된 해결책이 없습니다." :
+            "There are no solutions yet.";
+
+        box.appendChild(empty);
+    }
+
+}
+
+
+// Firebase에서 실시간으로 불러오기
+const q = query(
+    solutionsRef,
+    orderBy("date", "desc"),
+    limit(100)
+);
+
+onSnapshot(q, function(snapshot) {
+
+    solutions = [];
+
+    snapshot.forEach(function(doc) {
+        solutions.push(doc.data());
+    });
+
+    showSolutions();
+
+}, function(error) {
+
+    console.error("Firebase error:", error);
+
+    document.getElementById("solutions").innerText =
+        korean ? "해결책을 불러오지 못했습니다." :
+        "Could not load solutions.";
+
+});
+
+</script>
+
+</body>
+</html>
