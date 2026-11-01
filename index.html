@@ -1,219 +1,283 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ideas in the Clouds</title>
-  <style>
-    :root { color-scheme: light; --ink:#202020; --line:#dedede; --paper:#fff; --soft:#f6f6f6; }
-    * { box-sizing:border-box; }
-    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 Arial, Helvetica, sans-serif; }
-    main { width:min(760px, calc(100% - 32px)); margin:0 auto; padding:24px 0 60px; }
-    header { display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--line); padding-bottom:14px; }
-    .brand { font-size:14px; font-weight:bold; }
-    button, select, textarea { font:inherit; }
-    #language { border:1px solid var(--line); background:#fff; padding:6px 10px; cursor:pointer; }
-    h1 { font-size:clamp(30px, 6vw, 44px); line-height:1.1; letter-spacing:-1.3px; margin:34px 0 10px; }
-    .intro { color:#555; margin:0 0 26px; max-width:620px; }
-    form { border:1px solid var(--line); padding:18px; }
-    label { display:block; font-weight:bold; font-size:14px; margin:0 0 7px; }
-    select, textarea { display:block; width:100%; border:1px solid #cfcfcf; border-radius:0; background:#fff; padding:10px; margin-bottom:16px; }
-    textarea { min-height:120px; resize:vertical; }
-    select:focus, textarea:focus { outline:2px solid #777; outline-offset:1px; }
-    .form-bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
-    .hint { color:#666; font-size:12px; }
-    #submit { background:#202020; color:white; border:1px solid #202020; padding:10px 14px; cursor:pointer; }
-    #submit:disabled { opacity:.5; cursor:wait; }
-    #status { min-height:20px; margin:12px 0 0; font-size:13px; color:#444; }
-    .ideas-heading { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin:36px 0 12px; }
-    h2 { font-size:20px; margin:0; }
-    .ideas-heading p { color:#666; font-size:12px; margin:0; }
-    #ideas { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
-    .idea { border:1px solid var(--line); padding:12px; min-height:70px; overflow-wrap:anywhere; white-space:pre-wrap; }
-    .idea-category { color:#666; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
-    .empty { grid-column:1/-1; border:1px dashed var(--line); color:#777; padding:18px; font-size:13px; }
-    footer { border-top:1px solid var(--line); color:#666; font-size:12px; margin-top:34px; padding-top:12px; }
-    @media(max-width:540px) { #ideas { grid-template-columns:1fr; } main { padding-top:16px; } form { padding:14px; } .ideas-heading { align-items:flex-start; flex-direction:column; } }
-  </style>
+<meta charset="UTF-8">
+<title>Our Solutions</title>
+
+<style>
+body {
+    font-family: Arial;
+    background-color: white;
+    margin: 30px;
+    color: black;
+}
+
+h1 {
+    text-align: center;
+    font-size: 28px;
+}
+
+p {
+    text-align: center;
+}
+
+.language {
+    text-align: right;
+}
+
+button, select, textarea {
+    font-family: Arial;
+    padding: 8px;
+}
+
+.form {
+    width: 80%;
+    max-width: 600px;
+    margin: 30px auto;
+}
+
+select, textarea {
+    width: 100%;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 100px;
+}
+
+#ideas {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.idea {
+    border: 1px solid gray;
+    padding: 12px;
+    width: 180px;
+    min-height: 60px;
+    background-color: #f7f7f7;
+    overflow-wrap: anywhere;
+}
+
+.category {
+    font-size: 12px;
+    color: gray;
+    margin-bottom: 8px;
+}
+</style>
 </head>
+
 <body>
-  <main>
-    <header>
-      <div class="brand">IDEAS IN THE CLOUDS</div>
-      <button id="language" type="button">한국어</button>
-    </header>
 
-    <h1 data-i18n="title">Ideas for a better world.</h1>
-    <p class="intro" data-i18n="intro">Choose a social issue and share one idea for solving it. Your idea will appear below for other visitors to read.</p>
+<div class="language">
+    <button onclick="changeLanguage()">한국어 / English</button>
+</div>
 
-    <form id="ideaForm">
-      <label for="topic" data-i18n="topicLabel">Social issue</label>
-      <select id="topic" required>
-        <option value="Discrimination">Discrimination</option>
-        <option value="Privilege">Privilege</option>
-        <option value="Advocacy">Advocacy</option>
-        <option value="Environmental Degradation">Environmental Degradation</option>
-        <option value="Tyranny">Tyranny</option>
-      </select>
+<h1 id="title">Our Solutions for a Better World</h1>
 
-      <label for="idea" data-i18n="ideaLabel">Your idea</label>
-      <textarea id="idea" maxlength="500" required data-i18n-placeholder="placeholder" placeholder="Write your idea here..."></textarea>
+<p id="intro">
+Choose a problem and write your solution.
+</p>
 
-      <div class="form-bottom">
-        <span class="hint" data-i18n="hint">Text only · Max 500 characters · No name required</span>
-        <button id="submit" type="submit" data-i18n="submit">Submit idea</button>
-      </div>
-      <p id="status" role="status" aria-live="polite"></p>
-    </form>
+<div class="form">
 
-    <div class="ideas-heading">
-      <h2 data-i18n="ideasTitle">Community ideas</h2>
-      <p data-i18n="ideasNote">Latest submissions</p>
-    </div>
-    <section id="ideas" aria-live="polite">
-      <div class="empty" data-i18n="empty">Ideas will appear here after Firebase is connected.</div>
-    </section>
+<label id="problemLabel">Choose a social problem</label>
+<br><br>
 
-    <footer data-i18n="footer">Ideas are public. Do not include personal information.</footer>
-  </main>
+<select id="problem">
+    <option value="Discrimination">Discrimination</option>
+    <option value="Privilege">Privilege</option>
+    <option value="Advocacy">Advocacy</option>
+    <option value="Environmental Degradation">Environmental Degradation</option>
+    <option value="Tyranny">Tyranny</option>
+</select>
 
-  <script type="module">
-    // Replace these values with your Firebase web app configuration.
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      appId: "YOUR_APP_ID"
-    };
+<label id="ideaLabel">Write your solution</label>
+<br><br>
 
-    const copy = {
-      en: {
-        title:"Ideas for a better world.",
-        intro:"Choose a social issue and share one idea for solving it. Your idea will appear below for other visitors to read.",
-        topicLabel:"Social issue", ideaLabel:"Your idea", placeholder:"Write your idea here...",
-        hint:"Text only · Max 500 characters · No name required", submit:"Submit idea",
-        ideasTitle:"Community ideas", ideasNote:"Latest submissions",
-        empty:"Ideas will appear here after Firebase is connected.",
-        firebase:"Firebase setup is not complete yet.", sending:"Submitting...",
-        success:"Your idea has been submitted.", failed:"Could not submit. Please try again.",
-        categories:["Discrimination","Privilege","Advocacy","Environmental Degradation","Tyranny"],
-        footer:"Ideas are public. Do not include personal information."
-      },
-      ko: {
-        title:"더 나은 세상을 위한 아이디어.",
-        intro:"사회 문제를 선택하고 해결 아이디어를 남겨 주세요. 제출한 아이디어는 아래에 표시되어 다른 방문자도 읽을 수 있습니다.",
-        topicLabel:"사회 문제", ideaLabel:"해결 아이디어", placeholder:"아이디어를 입력하세요...",
-        hint:"본문만 입력 · 최대 500자 · 이름 불필요", submit:"아이디어 제출",
-        ideasTitle:"함께 모은 아이디어", ideasNote:"최근 제출 순",
-        empty:"Firebase를 연결하면 아이디어가 여기에 표시됩니다.",
-        firebase:"아직 Firebase 연결이 완료되지 않았습니다.", sending:"제출 중...",
-        success:"아이디어가 제출되었습니다.", failed:"제출하지 못했습니다. 다시 시도해 주세요.",
-        categories:["차별","특권","옹호·권리 보호","환경 파괴","독재·폭정"],
-        footer:"아이디어는 공개됩니다. 개인정보를 입력하지 마세요."
-      }
-    };
+<textarea id="idea" maxlength="500"
+placeholder="Write here..."></textarea>
 
-    const topic = document.querySelector("#topic");
-    const ideaInput = document.querySelector("#idea");
-    const form = document.querySelector("#ideaForm");
-    const status = document.querySelector("#status");
-    const submit = document.querySelector("#submit");
-    const ideasEl = document.querySelector("#ideas");
-    const language = document.querySelector("#language");
-    let lang = "en";
-    let saveIdea = null;
-    let unsubscribe = null;
-    let ideas = [];
+<br>
 
-    function renderIdeas() {
-      ideasEl.replaceChildren();
-      if (!ideas.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = copy[lang].empty;
-        ideasEl.append(empty);
+<button id="submitButton" onclick="addIdea()">Submit</button>
+
+<p id="message"></p>
+
+</div>
+
+<h2 id="ideasTitle">Solutions from People</h2>
+
+<div id="ideas">
+    <p>Solutions will appear here.</p>
+</div>
+
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    limit,
+    serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// Firebase 설정
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const ideasRef = collection(db, "ideas");
+
+let korean = false;
+let ideas = [];
+
+
+// 언어 변경
+window.changeLanguage = function() {
+
+    korean = !korean;
+
+    document.getElementById("title").innerText =
+        korean ? "더 나은 세상을 위한 우리들의 생각" :
+        "Our Solutions for a Better World";
+
+    document.getElementById("intro").innerText =
+        korean ? "사회 문제를 선택하고 해결 방법을 적어 보세요." :
+        "Choose a problem and write your solution.";
+
+    document.getElementById("problemLabel").innerText =
+        korean ? "사회 문제 선택" :
+        "Choose a social problem";
+
+    document.getElementById("ideaLabel").innerText =
+        korean ? "해결 방법 쓰기" :
+        "Write your solution";
+
+    document.getElementById("idea").placeholder =
+        korean ? "여기에 적으세요..." :
+        "Write here...";
+
+    document.getElementById("submitButton").innerText =
+        korean ? "제출" : "Submit";
+
+    document.getElementById("ideasTitle").innerText =
+        korean ? "사람들의 해결책" :
+        "Solutions from People";
+
+    showIdeas();
+};
+
+
+window.addIdea = async function() {
+
+    const text = document.getElementById("idea").value.trim();
+    const problem = document.getElementById("problem").value;
+    const message = document.getElementById("message");
+
+    if (text === "") {
+        message.innerText =
+            korean ? "내용을 입력하세요." : "Please write something.";
         return;
-      }
-      ideas.slice(0, 50).forEach(item => {
-        const card = document.createElement("article");
-        card.className = "idea";
-        const category = document.createElement("div");
-        category.className = "idea-category";
-        const categories = ["Discrimination","Privilege","Advocacy","Environmental Degradation","Tyranny"];
-        const idx = categories.indexOf(item.category);
-        category.textContent = idx >= 0 ? copy[lang].categories[idx] : item.category;
-        const text = document.createElement("div");
-        text.textContent = item.text;
-        card.append(category, text);
-        ideasEl.append(card);
-      });
     }
 
-    function setLanguage() {
-      document.documentElement.lang = lang;
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.dataset.i18n;
-        if (copy[lang][key]) el.textContent = copy[lang][key];
-      });
-      document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-        el.placeholder = copy[lang][el.dataset.i18nPlaceholder];
-      });
-      [...topic.options].forEach((option, i) => option.textContent = copy[lang].categories[i]);
-      language.textContent = lang === "en" ? "한국어" : "English";
-      renderIdeas();
-    }
-    language.addEventListener("click", () => {
-      lang = lang === "en" ? "ko" : "en";
-      setLanguage();
-    });
+    try {
 
-    async function connectFirebase() {
-      if (firebaseConfig.apiKey === "YOUR_API_KEY" || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
-        status.textContent = copy[lang].firebase;
-        return;
-      }
-      try {
-        const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-        const { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } =
-          await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-        const db = getFirestore(initializeApp(firebaseConfig));
-        const ref = collection(db, "ideas");
-        saveIdea = (category, text) => addDoc(ref, { category, text, createdAt: serverTimestamp() });
-        unsubscribe = onSnapshot(query(ref, orderBy("createdAt", "desc"), limit(50)), snapshot => {
-          ideas = snapshot.docs.map(doc => doc.data()).filter(x => typeof x.text === "string");
-          renderIdeas();
-        }, err => {
-          console.error(err);
-          status.textContent = copy[lang].failed;
+        await addDoc(ideasRef, {
+            problem: problem,
+            text: text,
+            date: serverTimestamp()
         });
-        status.textContent = "";
-      } catch (err) {
-        console.error(err);
-        status.textContent = copy[lang].failed;
-      }
+
+        document.getElementById("idea").value = "";
+
+        message.innerText =
+            korean ? "제출되었습니다!" : "Submitted!";
+
+    } catch (error) {
+
+        message.innerText =
+            korean ? "오류가 발생했습니다." : "There was an error.";
+
     }
 
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-      const text = ideaInput.value.trim();
-      if (!text) return;
-      if (!saveIdea) { status.textContent = copy[lang].firebase; return; }
-      submit.disabled = true;
-      status.textContent = copy[lang].sending;
-      try {
-        await saveIdea(topic.value, text.slice(0, 500));
-        ideaInput.value = "";
-        status.textContent = copy[lang].success;
-      } catch (err) {
-        console.error(err);
-        status.textContent = copy[lang].failed;
-      } finally {
-        submit.disabled = false;
-      }
+};
+
+function showIdeas() {
+
+    const box = document.getElementById("ideas");
+    box.innerHTML = "";
+
+    ideas.forEach(function(item) {
+
+        const card = document.createElement("div");
+        card.className = "idea";
+
+        const category = document.createElement("div");
+        category.className = "category";
+        category.innerText = item.problem;
+
+        const text = document.createElement("div");
+        text.innerText = item.text;
+
+        card.appendChild(category);
+        card.appendChild(text);
+
+        box.appendChild(card);
+
     });
 
-    setLanguage();
-    connectFirebase();
-  </script>
+    if (ideas.length === 0) {
+
+        const empty = document.createElement("p");
+
+        empty.innerText =
+            korean ? "해결책이 여기에 표시됩니다." :
+            "Solutions will appear here.";
+
+        box.appendChild(empty);
+    }
+
+}
+
+
+const q = query(
+    ideasRef,
+    orderBy("date", "desc"),
+    limit(40)
+);
+
+onSnapshot(q, function(snapshot) {
+
+    ideas = [];
+
+    snapshot.forEach(function(doc) {
+        ideas.push(doc.data());
+    });
+
+    showIdeas();
+
+});
+
+</script>
+
 </body>
 </html>
