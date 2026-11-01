@@ -89,11 +89,11 @@ Choose a problem and write your solution.
 <br><br>
 
 <select id="problem">
-    <option value="Discrimination">Discrimination</option>
-    <option value="Privilege">Privilege</option>
-    <option value="Advocacy">Advocacy</option>
-    <option value="Environmental Degradation">Environmental Degradation</option>
-    <option value="Tyranny">Tyranny</option>
+  <option value="Discrimination" data-en="Discrimination" data-ko="차별">Discrimination</option>
+  <option value="Privilege" data-en="Privilege" data-ko="특권">Privilege</option>
+  <option value="Advocacy" data-en="Advocacy" data-ko="옹호">Advocacy</option>
+  <option value="Environmental Degradation" data-en="Environmental Degradation" data-ko="환경 파괴">Environmental Degradation</option>
+  <option value="Tyranny" data-en="Tyranny" data-ko="폭정">Tyranny</option>
 </select>
 
 <label id="ideaLabel">Write your solution</label>
@@ -158,7 +158,10 @@ let ideas = [];
 window.changeLanguage = function() {
 
     korean = !korean;
-
+    document.querySelectorAll("#problem option").forEach(option => {
+      option.textContent = option.dataset[lang];
+    });
+        
     document.getElementById("title").innerText =
         korean ? "더 나은 세상을 위한 우리들의 생각" :
         "Our Solutions for a Better World";
@@ -185,7 +188,7 @@ window.changeLanguage = function() {
     document.getElementById("ideasTitle").innerText =
         korean ? "사람들의 해결책" :
         "Solutions from People";
-
+    
     showIdeas();
 };
 
