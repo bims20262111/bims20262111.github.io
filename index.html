@@ -154,6 +154,52 @@ const db = getFirestore(app);
 const ideasRef = collection(db, "solutions");
 
 let korean = false;
+// 부적절한 단어 목록
+const badWords = [
+
+    // 한국어 욕설 및 비하 표현
+    "시발", "씨발", "ㅅㅂ", "ㅆㅂ",
+    "병신", "븅신", "ㅂㅅ",
+    "지랄", "ㅈㄹ",
+    "개새끼", "새끼", "씹새끼",
+    "좆", "존나", "졸라",
+    "꺼져", "닥쳐", "엿먹어",
+    "미친놈", "미친년", "또라이",
+    "쓰레기", "벌레",
+
+    // 영어 욕설 및 비하 표현
+    "fuck", "fucking", "shit",
+    "bitch", "bastard", "asshole",
+    "dick", "damn", "crap",
+    "motherfucker", "stfu",
+    "idiot", "moron", "stupid",
+
+    // 혐오 및 차별 표현
+    "racist", "nazi", "retard",
+    "go kill yourself",
+    "you are worthless",
+    "hate you",
+
+    // 괴롭힘 및 위협 표현
+    "죽여버린다",
+    "죽어",
+    "죽이고 싶다",
+    "때려죽인다",
+    "가만두지 않겠다",
+    "찾아가서 혼내준다",
+    "괴롭혀주겠다"
+];
+
+// 부적절한 단어 검사
+function containsBadWord(text) {
+
+    const lowerText = text.toLowerCase();
+
+    return badWords.some(word =>
+        lowerText.includes(word.toLowerCase())
+    );
+
+}
 let ideas = [];
 
 
@@ -227,6 +273,16 @@ window.addIdea = async function() {
     if (text === "") {
         message.innerText =
             korean ? "내용을 입력하세요." : "Please write something.";
+        return;
+    }
+    
+    if (containsBadWord(text)) {
+
+        message.innerText =
+            korean
+            ? "부적절한 표현이 포함되어 있습니다. 수정해 주세요."
+            : "Your text contains inappropriate words. Please edit it.";
+
         return;
     }
 
