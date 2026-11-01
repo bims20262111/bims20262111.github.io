@@ -244,12 +244,11 @@ window.addIdea = async function() {
             korean ? "제출되었습니다!" : "Submitted!";
 
     } catch (error) {
-
-        console.error(error);
-
-        message.innerText =
-            korean ? "오류가 발생했습니다." : "There was an error.";
-
+    
+        console.error("Submit error:", error);
+    
+        message.innerText = error.code + ": " + error.message;
+    
     }
 
 };
