@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -148,20 +149,43 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const ideasRef = collection(db, "ideas");
+
+// Firebase 컬렉션 이름
+const ideasRef = collection(db, "solutions");
 
 let korean = false;
 let ideas = [];
+
+
+// 사회 문제 번역
+function translateProblem(problem) {
+
+    if (!korean) {
+        return problem;
+    }
+
+    const translations = {
+        "Discrimination": "차별",
+        "Privilege": "특권",
+        "Advocacy": "옹호",
+        "Environmental Degradation": "환경 파괴",
+        "Tyranny": "폭정"
+    };
+
+    return translations[problem] || problem;
+}
 
 
 // 언어 변경
 window.changeLanguage = function() {
 
     korean = !korean;
+
+    // 사회 문제 선택 목록 번역
     document.querySelectorAll("#problem option").forEach(option => {
-      option.textContent = option.dataset[lang];
+        option.textContent = option.dataset[korean ? "ko" : "en"];
     });
-        
+
     document.getElementById("title").innerText =
         korean ? "더 나은 세상을 위한 우리들의 생각" :
         "Our Solutions for a Better World";
@@ -188,11 +212,12 @@ window.changeLanguage = function() {
     document.getElementById("ideasTitle").innerText =
         korean ? "사람들의 해결책" :
         "Solutions from People";
-    
+
     showIdeas();
 };
 
 
+// 해결책 제출
 window.addIdea = async function() {
 
     const text = document.getElementById("idea").value.trim();
@@ -220,6 +245,8 @@ window.addIdea = async function() {
 
     } catch (error) {
 
+        console.error(error);
+
         message.innerText =
             korean ? "오류가 발생했습니다." : "There was an error.";
 
@@ -227,6 +254,8 @@ window.addIdea = async function() {
 
 };
 
+
+// 해결책 화면에 표시
 function showIdeas() {
 
     const box = document.getElementById("ideas");
@@ -239,7 +268,7 @@ function showIdeas() {
 
         const category = document.createElement("div");
         category.className = "category";
-        category.innerText = item.problem;
+        category.innerText = translateProblem(item.problem);
 
         const text = document.createElement("div");
         text.innerText = item.text;
@@ -265,6 +294,7 @@ function showIdeas() {
 }
 
 
+// Firebase에서 해결책 불러오기
 const q = query(
     ideasRef,
     orderBy("date", "desc"),
@@ -280,6 +310,14 @@ onSnapshot(q, function(snapshot) {
     });
 
     showIdeas();
+
+}, function(error) {
+
+    console.error("Firebase error:", error);
+
+    document.getElementById("ideas").innerText =
+        korean ? "해결책을 불러오지 못했습니다." :
+        "Could not load solutions.";
 
 });
 
